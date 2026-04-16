@@ -68,19 +68,25 @@ export function useAnimation(onPegHit, onLand) {
     const binY = POINTER_POLE_Y;
 
     if (prefersReducedMotion) {
-      setMotionPath({
-        id: Date.now(),
-        x: [binX],
-        y: [binY],
-        duration: 0,
-        binIndex,
-      });
+      setTimeout(() => {
+        setMotionPath({
+          id: Date.now() + Math.random(),
+          x: [...xs], 
+          y: [...ys], 
+          duration: DROP_DURATION,
+          binIndex,
+        });
+      }, 0);
       onLand?.(binIndex);
       return;
     }
 
-    setAnimating(true);
-    lastPegHit.current = -1;
+    setAnimating(false); 
+
+    setTimeout(() => {
+      setAnimating(true);
+      lastPegHit.current = -1;
+    }, 0);
 
     // ✅ FIXED START POSITION
     const firstPeg = pegPosition(0, 0);

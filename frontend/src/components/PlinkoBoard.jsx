@@ -90,19 +90,23 @@ export default function PlinkoBoard({
 
           {/* DYNAMIC BALL COMPONENT */}
           {motionPath && (
-            <motion.circle
-              key={motionPath.id}
-              r={BALL_RADIUS}
-              fill="#ffffff"
-              initial={false}
-              animate={{
-                x: motionPath.x,
-                y: motionPath.y,
-              }}
-              transition={{
-                duration: shouldReduceMotion ? 0.1 : motionPath.duration,
-                ease: "linear",
-              }}
+          <motion.circle
+            key={motionPath.id}
+            r={BALL_RADIUS}
+            fill="#ffffff"
+            initial={{
+              x: motionPath.x[0],
+              y: motionPath.y[0],
+            }}
+            animate={{
+              x: motionPath.x,
+              y: motionPath.y,
+            }}
+            transition={{
+              duration: shouldReduceMotion ? 0.1 : motionPath.duration,
+              ease: "linear",
+              times: motionPath.x.map((_, i) => i / (motionPath.x.length - 1)),
+            }}
               onUpdate={onUpdate}
               onAnimationComplete={onComplete}
               style={{
