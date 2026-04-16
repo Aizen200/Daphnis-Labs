@@ -24,57 +24,64 @@ export default function PlinkoBoard({
   onComplete,
   landedBin,
   animating,
+  debugGrid,
+  bet,
 }) {
   const pegs = [];
+  const debugText = [];
 
   for (let r = 0; r < ROWS; r++) {
     for (let p = 0; p <= r; p++) {
       const pos = pegPosition(r, p);
+
       pegs.push(
         <circle
           key={`${r}-${p}`}
           cx={pos.x}
           cy={pos.y}
           r={5}
-          fill="#c084fc"
-          opacity={0.8}
-          style={{
-            filter: "drop-shadow(0 0 6px rgba(192,132,252,0.6))"
-          }}
+          fill="purple"
         />
       );
+
+      if (debugGrid) {
+        debugText.push(
+          <text
+            key={`dbg-${r}-${p}`}
+            x={pos.x}
+            y={pos.y - 10}
+            fontSize="8"
+            fill="green"
+            textAnchor="middle"
+          >
+            {r},{p}
+          </text>
+        );
+      }
     }
   }
 
   const binWidth = WIDTH / (ROWS + 1);
 
   return (
-    <div className="
-      relative w-full max-w-[800px]
-      bg-indigo-950/40 backdrop-blur
-      border border-purple-500/20
-      rounded-2xl p-4
-      shadow-[0_0_60px_rgba(139,92,246,0.1)]
-    ">
+    <div>
 
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full">
+      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
 
         {/* PEGS */}
         {pegs}
+        {debugGrid && debugText}
 
         {/* BALL */}
         {motionPath && (
           <motion.circle
             r={10}
-            fill="#e9d5ff"
+            fill="white"
             initial={{ x: motionPath.x[0], y: motionPath.y[0] }}
             animate={{ x: motionPath.x, y: motionPath.y }}
             transition={{ duration: motionPath.duration, ease: "linear" }}
             onUpdate={onUpdate}
             onAnimationComplete={onComplete}
-            style={{
-              filter: "drop-shadow(0 0 10px rgba(168,85,247,0.9))"
-            }}
           />
         )}
 
@@ -82,37 +89,22 @@ export default function PlinkoBoard({
         {MULTIPLIERS.map((m, i) => {
           const x = i * binWidth;
 
-          let color =
-            m >= 5 ? "#a855f7" :   // HIGH
-            m >= 1 ? "#6366f1" :   // MID
-            "#334155";             // LOW
-
           return (
             <g key={i}>
               <rect
                 x={x}
-                y={HEIGHT - 60}
-                width={binWidth - 4}
-                height={45}
-                rx={10}
-                fill={color}
-                opacity={landedBin === i ? 1 : 0.7}
-                style={{
-                  filter:
-                    landedBin === i
-                      ? "drop-shadow(0 0 15px rgba(168,85,247,0.9))"
-                      : "none",
-                  transition: "all 0.3s ease",
-                }}
+                y={HEIGHT - 45}
+                width={binWidth}
+                height={38}
+                fill="gray"
               />
 
               <text
                 x={x + binWidth / 2}
-                y={HEIGHT - 30}
+                y={HEIGHT - 20}
                 textAnchor="middle"
-                fill="#fff"
-                fontSize="12"
-                fontWeight="bold"
+                fill="white"
+                fontSize="10"
               >
                 {m}x
               </text>
@@ -121,10 +113,22 @@ export default function PlinkoBoard({
         })}
       </svg>
 
+      {/* SIMPLE PAYOUT */}
+      {bet && (
+        <div>
+          {MULTIPLIERS.map((m) => (
+            <div key={m}>
+              {m}x → ₹{(bet * m).toFixed(0)}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* CONFETTI */}
       {!animating && landedBin !== null && (
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
+
     </div>
   );
 }
