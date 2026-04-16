@@ -1,17 +1,27 @@
-export default function ResultPanel({ landedBin, bet }) {
-  if (landedBin === null) return null;
-
-  const MULTIPLIERS = [10,5,3,1.5,1,0.5,0.3,0.5,1,1.5,3,5,10];
-  const multiplier = MULTIPLIERS[landedBin];
-  const win = bet * multiplier;
+export default function ResultPanel({ landedBin, bet, multiplier }) {
+  const win = bet * (multiplier || 0);
 
   return (
-    <div>
-      <p>Result</p>
+    <div className="flex flex-col items-center justify-center p-2 text-center h-full">
+      <p className="text-[10px] uppercase font-bold text-indigo-300/40 tracking-[0.2em] mb-3">
+        Round Outcome
+      </p>
 
-      <p>Bin: {landedBin}</p>
-      <p>Multiplier: {multiplier}x</p>
-      <p>Win: ₹{win}</p>
+      {landedBin === null ? (
+        <div className="text-indigo-500/30 font-black text-xs py-4 uppercase tracking-[0.2em] animate-pulse">
+          Scanning Path...
+        </div>
+      ) : (
+        <>
+          <div className="text-6xl font-black text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] animate-bounce relative z-10 neon-text">
+            {multiplier}x
+          </div>
+
+          <div className="mt-3 text-xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.6)]">
+            + ₹{win.toFixed(0)}
+          </div>
+        </>
+      )}
     </div>
   );
 }
