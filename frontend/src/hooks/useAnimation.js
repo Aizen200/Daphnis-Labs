@@ -7,6 +7,9 @@ export const PEG_RADIUS = 6;
 export const BALL_RADIUS = 11;
 const DROP_DURATION = 2.5;
 
+// ✅ optimized frames
+const FRAMES = 6;
+
 export function pegPosition(row, pegIndex) {
   const topPad = 80;
   const bottomPad = 120;
@@ -31,16 +34,21 @@ export function pegPosition(row, pegIndex) {
 }
 
 export function binCenterX(binIndex) {
-  const totalBins = ROWS + 1;
   const totalWidth = SVG_WIDTH * 0.7;
   const startX = (SVG_WIDTH - totalWidth) / 2;
-  const spacing = totalWidth / (totalBins - 1);
 
-  return startX + binIndex * spacing;
+  const lastRowPegSpacing = totalWidth / (ROWS - 1);
+  const halfSpacing = lastRowPegSpacing / 2;
+
+  const leftmostPegX = startX;
+  return leftmostPegX - halfSpacing + binIndex * lastRowPegSpacing;
 }
 
+const POINTER_POLE_Y = SVG_HEIGHT - 48;
+
+const EPS = 0.01;
 const ROW_Y_ZONES = Array.from({ length: ROWS }, (_, r) =>
-  pegPosition(r, 0).y - PEG_RADIUS - BALL_RADIUS
+  pegPosition(r, 0).y - PEG_RADIUS - BALL_RADIUS + EPS
 );
 
 export function useAnimation(onPegHit, onLand) {
@@ -57,7 +65,7 @@ export function useAnimation(onPegHit, onLand) {
     ).matches;
 
     const binX = binCenterX(binIndex);
-    const binY = SVG_HEIGHT - 60;
+    const binY = POINTER_POLE_Y;
 
     if (prefersReducedMotion) {
       setMotionPath({
@@ -67,7 +75,6 @@ export function useAnimation(onPegHit, onLand) {
         duration: 0,
         binIndex,
       });
-
       onLand?.(binIndex);
       return;
     }
@@ -75,25 +82,31 @@ export function useAnimation(onPegHit, onLand) {
     setAnimating(true);
     lastPegHit.current = -1;
 
-    let currentX = SVG_WIDTH / 2;
-    let currentY = 20;
+    // ✅ FIXED START POSITION
+    const firstPeg = pegPosition(0, 0);
+
+    let currentX = firstPeg.x;
+    let currentY = firstPeg.y - PEG_RADIUS - BALL_RADIUS - 40;
 
     const xs = [currentX];
     const ys = [currentY];
 
     let pegIdx = 0;
-    const FRAMES = 15;
 
     for (let r = 0; r < ROWS; r++) {
       const peg = pegPosition(r, pegIdx);
-
       const targetX = peg.x;
       const targetY = peg.y - PEG_RADIUS - BALL_RADIUS;
 
-      const ctrlX = currentX + (targetX - currentX) * 0.5;
+      // ✅ FIXED FIRST DROP (no sideways movement)
+      const ctrlX =
+        r === 0
+          ? currentX
+          : currentX + (targetX - currentX) * 0.5;
+
       const ctrlY =
         r === 0
-          ? currentY + (targetY - currentY) * 0.2
+          ? currentY + (targetY - currentY) * 0.5
           : currentY - 35;
 
       for (let i = 1; i <= FRAMES; i++) {
@@ -119,6 +132,7 @@ export function useAnimation(onPegHit, onLand) {
       if (path[r] === "R") pegIdx++;
     }
 
+    // Final segment
     const ctrlX = currentX + (binX - currentX) * 0.5;
     const ctrlY = currentY - 35;
 
@@ -150,7 +164,6 @@ export function useAnimation(onPegHit, onLand) {
 
   const handleUpdate = useCallback((latest) => {
     if (!latest?.y) return;
-
     const y = parseFloat(latest.y);
 
     for (let i = 0; i < ROWS; i++) {
@@ -163,14 +176,12 @@ export function useAnimation(onPegHit, onLand) {
 
   const handleComplete = useCallback(() => {
     setAnimating(false);
-
     if (motionPath) {
       onLand?.(motionPath.binIndex);
     }
     setTimeout(() => {
       setMotionPath(null);
     }, 50);
-
   }, [motionPath, onLand]);
 
   return {

@@ -9,10 +9,6 @@ import {
 import { runGame } from "../engine.js";
 
 const router = Router();
-
-/**
- * 1. COMMIT
- */
 router.post("/rounds/commit", async (req, res, next) => {
   try {
     const serverSeed = generateServerSeed();
@@ -37,10 +33,6 @@ router.post("/rounds/commit", async (req, res, next) => {
     next(err);
   }
 });
-
-/**
- * 2. START (CORE)
- */
 router.post("/rounds/:id/start", async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -86,10 +78,6 @@ router.post("/rounds/:id/start", async (req, res, next) => {
     next(err);
   }
 });
-
-/**
- * 3. REVEAL
- */
 router.post("/rounds/:id/reveal", async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -131,23 +119,36 @@ router.get("/rounds/:id", async (req, res, next) => {
   }
 });
 router.get("/verify", (req, res) => {
-  const { serverSeed, clientSeed, nonce, dropColumn } = req.query;
-
-  if (!serverSeed || !clientSeed || !nonce || dropColumn === undefined) {
-    return res.status(400).json({ error: "missing params" });
-  }
-
+  let { serverSeed, clientSeed, nonce, dropColumn } = req.query;
+  const serverSeedClean = String(serverSeed || "").trim();
+  const clientSeedClean = String(clientSeed || "").trim();
+  const nonceClean = String(nonce || "").trim();
   const col = parseInt(dropColumn, 10);
 
-  const commitHex = makeCommitHex(serverSeed, nonce);
-  const result = runGame(serverSeed, clientSeed, nonce, col);
+  if (!serverSeedClean || !clientSeedClean || !nonceClean || isNaN(col)) {
+    return res.status(400).json({ error: "missing or invalid params" });
+  }
+  try {
+    const commitHex = makeCommitHex(serverSeedClean, nonceClean);
+    const result = runGame(
+      serverSeedClean,
+      clientSeedClean,
+      nonceClean,
+      col
+    );
 
-  res.json({
-    commitHex,
-    combinedSeed: result.combinedSeed,
-    pegMapHash: result.pegMapHash,
-    binIndex: result.binIndex,
-  });
+    res.json({
+      commitHex,
+      combinedSeed: result.combinedSeed,
+      pegMapHash: result.pegMapHash,
+      binIndex: result.binIndex,
+      payoutMultiplier: result.payoutMultiplier,
+      path: result.path,
+    });
+  } catch (err) {
+    console.error("Verify error:", err);
+    res.status(500).json({ error: "verification failed" });
+  }
 });
 
 export default router;

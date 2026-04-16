@@ -5,7 +5,7 @@ export function sha256(input) {
 }
 
 export function generateServerSeed() {
-  return randomBytes(32).toString("hex");
+  return randomBytes(32).toString("hex"); // 256-bit
 }
 
 export function generateNonce() {
@@ -13,9 +13,9 @@ export function generateNonce() {
 }
 
 export function makeCommitHex(serverSeed, nonce) {
-  return sha256(serverSeed + ":" + nonce);
+  return sha256(`${serverSeed}:${nonce}`);
 }
 
 export function makeCombinedSeed(serverSeed, clientSeed, nonce) {
-  return sha256(serverSeed + ":" + clientSeed + ":" + nonce);
+  return sha256(`${serverSeed}:${clientSeed}:${nonce}`);
 }
