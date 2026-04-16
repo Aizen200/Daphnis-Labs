@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
     "db:migrate": "npx prisma migrate dev",
     "db:push": "npx prisma db push",
     "db:generate": "npx prisma generate",
@@ -23,6 +25,7 @@
     "prisma": "^5.22.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "vitest": "^4.1.4"
   }
 }
