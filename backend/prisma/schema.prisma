@@ -1,5 +1,3 @@
-// Prisma schema for Provably Fair Plinko Game
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,11 +10,11 @@ datasource db {
 model Round {
   id               String    @id @default(cuid())
   createdAt        DateTime  @default(now())
-  status           String    @default("committed")
+  status           String    @default("CREATED")
 
   nonce            String
   commitHex        String
-  serverSeed       String?
+  serverSeed       String
   clientSeed       String?
   combinedSeed     String?
   pegMapHash       String?
@@ -30,4 +28,6 @@ model Round {
 
   pathJson         Json?
   revealedAt       DateTime?
+
+  @@index([createdAt])
 }
