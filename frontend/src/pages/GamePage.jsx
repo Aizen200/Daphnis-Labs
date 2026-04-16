@@ -48,6 +48,7 @@ export default function GamePage() {
     setLandedBin(null);
 
     const result = await game.dropBall(bet * 100, dropColumn);
+    console.log(result)
 
     if (result) {
       startAnimation(result.path, result.binIndex);
