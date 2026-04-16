@@ -42,18 +42,26 @@ export default function GamePage() {
     handleComplete,
   } = useAnimation(onPegHit, onLand);
 
-  const handleDrop = useCallback(async () => {
-    if (animating || game.loading) return;
+ const handleDrop = useCallback(async () => {
+  if (animating || game.loading) return;
 
-    setLandedBin(null);
+  setLandedBin(null);
 
+  try {
     const result = await game.dropBall(bet * 100, dropColumn);
-    console.log(result)
 
-    if (result) {
-      startAnimation(result.path, result.binIndex);
-    }
-  }, [animating, game.loading, bet, dropColumn]);
+    console.log("RESULT:", result);
+
+    setTimeout(() => {
+      if (result && result.path) {
+        startAnimation([...result.path], result.binIndex);
+      }
+    }, 0);
+
+  } catch (err) {
+    console.error(err);
+  }
+}, [animating, game.loading, bet, dropColumn, startAnimation]);
 
   // ✅ KEYBOARD + SECRET THEME
   useEffect(() => {
