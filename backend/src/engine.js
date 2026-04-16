@@ -12,8 +12,8 @@ export function generatePegMap(rand, rows = 12) {
     const row = [];
 
     for (let p = 0; p <= r; p++) {
-      const raw = 0.5 + (rand() - 0.5) * 0.2;
-      const clamped = clamp(raw, 0.4, 0.6);
+      const raw = 0.5 + (rand() - 0.5) * 0.5;
+      const clamped = Math.min(Math.max(raw, 0.2), 0.8);
       const rounded = Number(clamped.toFixed(6));
       row.push(rounded);
     }
