@@ -301,7 +301,7 @@ All critical logic was **reviewed, tested, and validated manually**.
 
 ---
 
-## ⏱️ Time Spent
+## Time Spent
 
 | Task              | Time  |
 | ----------------- | ----- |
