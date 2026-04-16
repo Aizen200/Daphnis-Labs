@@ -30,7 +30,7 @@ This project focuses on **deterministic systems, cryptographic fairness, and pol
 
 ---
 
-## 🔄 System Flow
+## System Flow
 
 1. Client calls `/commit`
 2. Server generates `serverSeed + nonce`
@@ -75,7 +75,7 @@ Custom **xorshift32** implementation:
 
 ---
 
-## 🎲 Deterministic Game Engine
+## Deterministic Game Engine
 
 ### Configuration
 
