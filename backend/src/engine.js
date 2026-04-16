@@ -1,7 +1,7 @@
 import { sha256, makeCombinedSeed } from "./crypto.js";
 import { createPRNG } from "./prng.js";
 
-const PAYOUT_MULTIPLIERS = [10, 5, 3, 1.5, 1, 0.5, 0.3, 0.5, 1, 1.5, 3, 5, 10];
+const PAYOUT_MULTIPLIERS = [10, 5, 3, 1.5, 1, 0.5, 0.5, 0.5, 1, 1.5, 3, 5, 10];
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
